@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/shelman/mongo-tools-proto/common/db"
 	commonopts "github.com/shelman/mongo-tools-proto/common/options"
 	"github.com/shelman/mongo-tools-proto/common/util"
@@ -46,6 +45,6 @@ func main() {
 		SessionProvider: sessionProvider,
 	}
 
-	fmt.Printf("%#v", dump.ToolOptions)
+	_ = dump.Dump()
 
 }
