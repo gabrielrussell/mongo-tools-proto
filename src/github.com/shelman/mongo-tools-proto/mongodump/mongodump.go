@@ -45,8 +45,7 @@ func (dmp *MongoDump) Dump() error {
 
 	collection := session.DB(dmp.ToolOptions.Namespace.DB).C(dmp.ToolOptions.Namespace.Collection)
 
-	log.Logf(0, "%v", dmp.ToolOptions.Verbosity.Verbose)
-	log.Logf(0, "DATABASE %v to %v", dmp.ToolOptions.Namespace.DB, dmp.ToolOptions.Namespace.Collection)
+	log.Logf(0, "DATABASE %v, %v", dmp.ToolOptions.Namespace.DB, dmp.ToolOptions.Namespace.Collection)
 
 	cursor := collection.Find(bson.M{}).Iter()
 	defer cursor.Close()
@@ -74,5 +73,9 @@ func (dmp *MongoDump) Dump() error {
 	w.Flush()
 
 	return nil
+}
 
+func (dmp *MongoDump) DumpCollection(c string) {
+	//TODO bson
+	//TODO metadata
 }

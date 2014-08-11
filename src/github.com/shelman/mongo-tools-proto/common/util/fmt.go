@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -12,6 +13,13 @@ const (
 // Panic with a formatted string
 func Panicf(s string, args ...interface{}) {
 	panic(fmt.Sprintf(s, args...))
+}
+
+// Exitf printfs the string and args on one line, then exits with
+// the supplied exit code
+func Exitf(code int, s string, args ...interface{}) {
+	fmt.Println(fmt.Sprintf(s, args...))
+	os.Exit(code)
 }
 
 // Println a formatted string

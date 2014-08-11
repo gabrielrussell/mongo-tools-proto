@@ -1,24 +1,31 @@
 package main
 
 import (
+	"fmt"
 	"github.com/shelman/mongo-tools-proto/common/db"
 	"github.com/shelman/mongo-tools-proto/common/log"
 	commonopts "github.com/shelman/mongo-tools-proto/common/options"
 	"github.com/shelman/mongo-tools-proto/common/util"
 	"github.com/shelman/mongo-tools-proto/mongodump"
 	"github.com/shelman/mongo-tools-proto/mongodump/options"
+	"os"
 )
 
 func main() {
 	// initialize command-line opts
-	opts := commonopts.New("mongodump", "0.0.1", "<options> <sleeptime>")
+	opts := commonopts.New("mongodump", "0.0.1", "<options>")
 
 	inputOpts := &options.InputOptions{}
 	opts.AddOptions(inputOpts)
+	outputOpts := &options.OutputOptions{}
+	opts.AddOptions(outputOpts)
 
 	_, err := opts.Parse()
 	if err != nil {
-		util.Panicf("error parsing command line options: %v", err)
+		fmt.Printf("error parsing command line options: %v\n\n", err)
+		opts.Help = true //TODO HACK HACK HACK, change options package at some point
+		opts.PrintHelp()
+		os.Exit(2)
 	}
 
 	// print help, if specified
