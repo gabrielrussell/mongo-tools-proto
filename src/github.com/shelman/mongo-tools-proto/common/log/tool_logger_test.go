@@ -37,3 +37,5 @@ func TestBasicToolLoggerFunctionality(t *testing.T) {
 		})
 	})
 }
+
+//TODO test panics, global loggger, etc

@@ -2,18 +2,17 @@ package main
 
 import (
 	"github.com/shelman/mongo-tools-proto/common/db"
+	"github.com/shelman/mongo-tools-proto/common/log"
 	commonopts "github.com/shelman/mongo-tools-proto/common/options"
 	"github.com/shelman/mongo-tools-proto/common/util"
 	"github.com/shelman/mongo-tools-proto/mongodump"
-	"github.com/shelman/mongo-tools-proto/mongoexport/options"
+	"github.com/shelman/mongo-tools-proto/mongodump/options"
 )
 
 func main() {
 	// initialize command-line opts
 	opts := commonopts.New("mongodump", "0.0.1", "<options> <sleeptime>")
 
-	outputOpts := &options.OutputFormatOptions{}
-	opts.AddOptions(outputOpts)
 	inputOpts := &options.InputOptions{}
 	opts.AddOptions(inputOpts)
 
@@ -32,6 +31,9 @@ func main() {
 		return
 	}
 
+	// init logger
+	log.InitToolLogger(opts.Verbosity)
+
 	// create a session provider to connect to the db
 	sessionProvider, err := db.InitSessionProvider(opts)
 	if err != nil {
@@ -41,7 +43,7 @@ func main() {
 	dump := mongodump.MongoDump{
 		ToolOptions: opts,
 		//OutputOpts:      outputOpts,
-		//InputOpts:       inputOpts,
+		InputOptions:    inputOpts,
 		SessionProvider: sessionProvider,
 	}
 

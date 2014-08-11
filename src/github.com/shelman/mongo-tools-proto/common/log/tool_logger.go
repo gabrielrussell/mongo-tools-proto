@@ -13,6 +13,8 @@ const (
 	MongoDumpLegacyDate = "Mon Jan _2 15:04:05.000"
 )
 
+//====== Tool Logger Definition ======
+
 type ToolLogger struct {
 	m      *sync.Mutex
 	w      io.Writer
@@ -67,8 +69,45 @@ func NewToolLogger(verbosity *options.Verbosity) *ToolLogger {
 	tl := &ToolLogger{
 		m:      &sync.Mutex{},
 		w:      os.Stderr,           // default to stderr
-		format: MongoDumpLegacyDate, //TODO whats up with this?
+		format: MongoDumpLegacyDate, // TODO whats up with this?
 	}
 	tl.SetVerbosity(verbosity)
 	return tl
+}
+
+//====== Global Logging ======
+
+var globalToolLogger *ToolLogger
+
+func assertGlobalToolLoggerInitialized() {
+	if globalToolLogger == nil {
+		panic("must initialize the global ToolLogger before use")
+	}
+}
+
+func InitToolLogger(verbosity *options.Verbosity) {
+	if globalToolLogger != nil {
+		panic("global ToolLogger already initialized")
+	}
+	globalToolLogger = NewToolLogger(verbosity)
+}
+
+func Logf(minVerb int, format string, a ...interface{}) {
+	assertGlobalToolLoggerInitialized()
+	globalToolLogger.Logf(minVerb, format, a...)
+}
+
+func SetVerbosity(verbosity *options.Verbosity) {
+	assertGlobalToolLoggerInitialized()
+	globalToolLogger.SetVerbosity(verbosity)
+}
+
+func SetWriter(writer io.Writer) {
+	assertGlobalToolLoggerInitialized()
+	globalToolLogger.SetWriter(writer)
+}
+
+func SetDateFormat(dateFormat string) {
+	assertGlobalToolLoggerInitialized()
+	globalToolLogger.SetDateFormat(dateFormat)
 }
