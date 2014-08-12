@@ -3,14 +3,11 @@ package log
 import (
 	"fmt"
 	"github.com/shelman/mongo-tools-proto/common/options"
+	"github.com/shelman/mongo-tools-proto/common/util"
 	"io"
 	"os"
 	"sync"
 	"time"
-)
-
-const (
-	MongoDumpLegacyDate = "Mon Jan _2 15:04:05.000"
 )
 
 //====== Tool Logger Definition ======
@@ -69,7 +66,7 @@ func NewToolLogger(verbosity *options.Verbosity) *ToolLogger {
 	tl := &ToolLogger{
 		m:      &sync.Mutex{},
 		w:      os.Stderr,           // default to stderr
-		format: MongoDumpLegacyDate, // TODO whats up with this?
+		format: util.ToolTimeFormat, // TODO whats up with this?
 	}
 	tl.SetVerbosity(verbosity)
 	return tl

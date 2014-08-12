@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	toolTimeFormat = "2006-01-02T15:04:05.000-0700"
+	ToolTimeFormat = "2006-01-02T15:04:05.000-0700"
 )
 
 // Panic with a formatted string
@@ -29,13 +29,13 @@ func Printlnf(s string, args ...interface{}) (int, error) {
 
 // PrintlnTimeStamped a formatted string along side the timestamp
 func PrintlnTimeStamped(s string, args ...interface{}) (int, error) {
-	return fmt.Println(time.Now().Format(toolTimeFormat),
+	return fmt.Println(time.Now().Format(ToolTimeFormat),
 		fmt.Sprintf(s, args...))
 }
 
 // PrintfTimeStamped a formatted string along side the timestamp
 func PrintfTimeStamped(s string, args ...interface{}) (int, error) {
 	line := fmt.Sprintf(s, args...)
-	return fmt.Printf(fmt.Sprintf("%v %v", time.Now().Format(toolTimeFormat),
+	return fmt.Printf(fmt.Sprintf("%v %v", time.Now().Format(ToolTimeFormat),
 		line))
 }

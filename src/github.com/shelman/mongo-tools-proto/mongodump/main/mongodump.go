@@ -48,8 +48,8 @@ func main() {
 	}
 
 	dump := mongodump.MongoDump{
-		ToolOptions: opts,
-		//OutputOpts:      outputOpts,
+		ToolOptions:     opts,
+		OutputOptions:   outputOpts,
 		InputOptions:    inputOpts,
 		SessionProvider: sessionProvider,
 	}
