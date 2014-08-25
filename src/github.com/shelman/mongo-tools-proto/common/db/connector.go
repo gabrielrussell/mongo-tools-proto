@@ -14,6 +14,8 @@ type DBConnector interface {
 
 	// dial the database and get a fresh new session
 	GetNewSession() (*mgo.Session, error)
+
+	GetDialError() error
 }
 
 var (
@@ -48,4 +50,8 @@ func (self *VanillaDBConnector) Configure(opts *options.ToolOptions) error {
 // Dial the database.
 func (self *VanillaDBConnector) GetNewSession() (*mgo.Session, error) {
 	return mgo.DialWithInfo(self.dialInfo)
+}
+
+func (self *VanillaDBConnector) GetDialError() error {
+	return nil
 }

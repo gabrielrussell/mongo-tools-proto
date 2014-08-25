@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/shelman/mongo-tools-proto/common/db/command"
 	"github.com/shelman/mongo-tools-proto/common/db/kerberos"
+	"github.com/shelman/mongo-tools-proto/common/db/openssl"
 	"github.com/shelman/mongo-tools-proto/common/db/ssl"
 	"github.com/shelman/mongo-tools-proto/common/options"
 	"gopkg.in/mgo.v2"
@@ -58,13 +59,19 @@ func InitSessionProvider(opts *options.ToolOptions) (*SessionProvider,
 	// create the connector for dialing the database
 	provider.connector = getConnector(opts)
 
+	var err error
 	// configure the connector
-	provider.connector.Configure(opts)
+	err = provider.connector.Configure(opts)
+	if err != nil {
+		return nil, fmt.Errorf("error configuring the connector: %v", err)
+	}
 
 	// initialize the provider's master session
-	var err error
 	provider.masterSession, err = provider.connector.GetNewSession()
 	if err != nil {
+		if dialError := provider.connector.GetDialError(); dialError != nil {
+			return nil, fmt.Errorf("error connecting to db server: %v\nopenssl error: %v", err, dialError)
+		}
 		return nil, fmt.Errorf("error connecting to db server: %v", err)
 	}
 
@@ -75,6 +82,10 @@ func InitSessionProvider(opts *options.ToolOptions) (*SessionProvider,
 func getConnector(opts *options.ToolOptions) DBConnector {
 	if opts.Auth.Mechanism == "GSSAPI" {
 		return &kerberos.KerberosDBConnector{}
+	}
+
+	if opts.SSL.UseOpenSSL {
+		return &openssl.SSLDBConnector{}
 	}
 
 	if opts.SSL.UseSSL {

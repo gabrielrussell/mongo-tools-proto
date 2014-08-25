@@ -58,6 +58,11 @@ func (self *SSLDBConnector) GetNewSession() (*mgo.Session, error) {
 	return mgo.DialWithInfo(self.dialInfo)
 }
 
+// Dial the server.
+func (self *SSLDBConnector) GetDialError() error {
+	return nil
+}
+
 // To be handed to mgo.DialInfo for connecting to the server.
 type dialerFunc func(addr *mgo.ServerAddr) (net.Conn, error)
 
