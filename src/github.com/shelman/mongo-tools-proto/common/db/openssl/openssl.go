@@ -63,16 +63,17 @@ func (self *SSLDBConnector) Configure(opts *options.ToolOptions) error {
 
 // Dial the server.
 func (self *SSLDBConnector) GetNewSession() (*mgo.Session, error) {
-	return mgo.DialWithInfo(self.dialInfo)
-}
-
-func (self *SSLDBConnector) GetDialError() error {
-	return self.dialError
+	session, err := mgo.DialWithInfo(self.dialInfo)
+	if err != nil && self.dialError != nil {
+		return nil, fmt.Printf("%v, openssl error: %v", err, self.dialError)
+	}
+	return session, err
 }
 
 // To be handed to mgo.DialInfo for connecting to the server.
 type dialerFunc func(addr *mgo.ServerAddr) (net.Conn, error)
 
+// Creates and configures an openssl.Ctx
 func setupCtx(opts *options.ToolOptions) (*openssl.Ctx, error) {
 	var ctx *openssl.Ctx
 	var err error
@@ -82,10 +83,18 @@ func setupCtx(opts *options.ToolOptions) (*openssl.Ctx, error) {
 	}
 
 	if ctx, err = openssl.NewCtxWithVersion(openssl.AnyVersion); err != nil {
-		return nil, err
+		return nil, fmt.Errors("failure creating new openssl context with "+
+			"NewCtxWithVersion(AnyVersion): %v", err)
 	}
+
+	// OpAll - Activate all bug workaround options, to support buggy client SSL's.
+	// NoSSLv2 - Disable SSL v2 support
 	ctx.SetOptions(openssl.OpAll | openssl.NoSSLv2)
 
+	// HIGH - Enable strong ciphers
+	// !EXPORT - Disable export ciphers (40/56 bit)
+	// !aNULL - Disable anonymous auth ciphers
+	// @STRENGTH - Sort ciphers based on strength
 	ctx.SetCipherList("HIGH:!EXPORT:!aNULL@STRENGTH")
 
 	// add the PEM key file with the cert and private key, if specified
@@ -97,6 +106,7 @@ func setupCtx(opts *options.ToolOptions) (*openssl.Ctx, error) {
 		if err = ctx.UsePrivateKeyFile(opts.SSLPEMKeyFile, openssl.FiletypePEM); err != nil {
 			return nil, fmt.Errorf("UsePrivateKeyFile: %v", err)
 		}
+		// Verify that the certificate and the key go together.
 		if err = ctx.CheckPrivateKey(); err != nil {
 			return nil, fmt.Errorf("CheckPrivateKey: %v", err)
 		}
@@ -134,7 +144,7 @@ func setupCtx(opts *options.ToolOptions) (*openssl.Ctx, error) {
 		store.SetFlags(openssl.CRLCheck)
 		lookup, err := store.AddLookup(openssl.X509LookupFile())
 		if err != nil {
-			return nil, fmt.Errorf("AddLookupFile: %v", err)
+			return nil, fmt.Errorf("AddLookup(X509LookupFile()): %v", err)
 		}
 		lookup.LoadCRLFile(opts.SSLCRLFile)
 	}

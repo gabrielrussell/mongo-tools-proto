@@ -59,9 +59,8 @@ func InitSessionProvider(opts *options.ToolOptions) (*SessionProvider,
 	// create the connector for dialing the database
 	provider.connector = getConnector(opts)
 
-	var err error
 	// configure the connector
-	err = provider.connector.Configure(opts)
+	err := provider.connector.Configure(opts)
 	if err != nil {
 		return nil, fmt.Errorf("error configuring the connector: %v", err)
 	}
@@ -69,9 +68,6 @@ func InitSessionProvider(opts *options.ToolOptions) (*SessionProvider,
 	// initialize the provider's master session
 	provider.masterSession, err = provider.connector.GetNewSession()
 	if err != nil {
-		if dialError := provider.connector.GetDialError(); dialError != nil {
-			return nil, fmt.Errorf("error connecting to db server: %v\nopenssl error: %v", err, dialError)
-		}
 		return nil, fmt.Errorf("error connecting to db server: %v", err)
 	}
 

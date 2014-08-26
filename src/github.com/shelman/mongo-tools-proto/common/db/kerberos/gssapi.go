@@ -42,7 +42,3 @@ func (self *KerberosDBConnector) Configure(opts *options.ToolOptions) error {
 func (self *KerberosDBConnector) GetNewSession() (*mgo.Session, error) {
 	return mgo.DialWithInfo(self.dialInfo)
 }
-
-func (self *KerberosDBConnector) GetDialError() error {
-	return nil
-}
