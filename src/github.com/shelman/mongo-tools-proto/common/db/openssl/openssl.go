@@ -65,7 +65,7 @@ func (self *SSLDBConnector) Configure(opts *options.ToolOptions) error {
 func (self *SSLDBConnector) GetNewSession() (*mgo.Session, error) {
 	session, err := mgo.DialWithInfo(self.dialInfo)
 	if err != nil && self.dialError != nil {
-		return nil, fmt.Printf("%v, openssl error: %v", err, self.dialError)
+		return nil, fmt.Errorf("%v, openssl error: %v", err, self.dialError)
 	}
 	return session, err
 }
@@ -83,7 +83,7 @@ func setupCtx(opts *options.ToolOptions) (*openssl.Ctx, error) {
 	}
 
 	if ctx, err = openssl.NewCtxWithVersion(openssl.AnyVersion); err != nil {
-		return nil, fmt.Errors("failure creating new openssl context with "+
+		return nil, fmt.Errorf("failure creating new openssl context with "+
 			"NewCtxWithVersion(AnyVersion): %v", err)
 	}
 
