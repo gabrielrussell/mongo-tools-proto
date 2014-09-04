@@ -45,6 +45,11 @@ set_dependencies() {
       line=($line)
       local package=${line[0]}
       local version=${line[1]}
+      local dest=""
+      if [[ -n ${line[2]:-} ]]; then
+        dest=$package
+        package=${line[2]}
+      fi
 
       if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]
       then
@@ -69,6 +74,18 @@ set_dependencies() {
       { echo ">> Failed to set $package to version $version"; exit 1; }
 
       echo ">> Set $package to version $version"
+      if [[ -n "$dest" ]] ; then
+        if [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" ]]
+        then
+          local dest_path="${GOPATH%%;*}/src/${dest%%/...}"
+        else
+          local dest_path="${GOPATH%%:*}/src/${dest%%/...}"
+        fi
+        mkdir -p "$(dirname "$dest_path")"
+        rm -rf $dest_path
+        mv $install_path $dest_path
+        echo ">> moved $install_path to $dest_path"
+      fi
     ) &
     pids=(${pids[@]-} $!)
   done < $1
